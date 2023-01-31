@@ -51,136 +51,101 @@ data = {
     'password': config('PASSWORD'),
     'next': '',
 }
-url = 'https://terraceramica.ru'
 
-# response = requests.post('https://terraceramica.ru/login/', cookies=cookies, headers=headers, data=data)
-# print(response)
-# res = requests.get('https://terraceramica.ru/')
-# print(res.text)
-# import time
 
-class Parse():
 
-    def get_html(url: str, headers: dict='', params: str=''):
-        """ Функция для получения html кода """
-        html = requests.get(
-            url=url,
-            headers=headers,
-            params=params,
-            cookies=cookies,
-            verify=False 
-        )
-        return html
+async def get_page_data(session):
+    
+    
+    url = 'https://terraceramica.ru'
+    response = await session.get(url=url, data=data, headers=headers, cookies=cookies)
+    soup = BeautifulSoup(await response.text(), "lxml")
+    # print(soup)
+    # links = []
+    # cards: ResultSet = soup.find_all('div', class_="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 d-flex")
+    # for link in cards:
+    #     link = link.find('a', class_='card_any').get('href')[0:17]
+    #     # print(link)
+    #     link = f'{url}{link}'
+    #     print(link)
+    # links.append(link)
 
-    def nomenclature_urls(html: str) -> ResultSet:
-        """ Функция для получения url с главной страницы"""
-        soup = BeautifulSoup(html.text, 'lxml')
+
+
+async def gather_data():
+
+    url = 'https://terraceramica.ru'
+
+
+    async with aiohttp.ClientSession(trust_env=True) as session:
+        response = await session.get(url=url, data=data, headers=headers, cookies=cookies)
+        soup = BeautifulSoup(await response.text(), "lxml")
         # print(soup)
+        links = []
         cards: ResultSet = soup.find_all('div', class_="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 d-flex")
-        links =[]
         for link in cards:
             link = link.find('a', class_='card_any').get('href')[0:17]
             # print(link)
             link = f'{url}{link}'
-            links.append(link)
-        return links
-
-    nomenclature_urls = nomenclature_urls(get_html(url))
-    def countries_urls(urls: list):
-        """ Функция для получения url с страницы КЕРАМИКА"""
-        # print(urls[0])
-        # for url in urls:
-        #     # print(url)
-        html = requests.get(url=urls[0], headers=headers)
-        # print(html.text)
-        soup = BeautifulSoup(html.text, 'lxml')
-        cards = soup.find_all('div', class_='col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 d-flex')
-        links = []
-        for link in cards:
-            link = link.find('a', class_='card_any').get('href')
-            link = f'{url}{link}'
             # print(link)
             links.append(link)
-        return links
+        # print(links)
+        links2 = []
+        for link in links:
+            async with aiohttp.ClientSession(trust_env=True) as session:
+                response = await session.get(url=link, data=data, headers=headers, cookies=cookies)
+                soup = BeautifulSoup(await response.text(), "lxml")
+                # print(soup)
+                cards = soup.find_all('div', class_='col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 d-flex')
+            
+                for link in cards:
+                    # print(link)
+                    try:
+                        link = link.find('a', class_='card_any').get('href')
+                    except AttributeError:
+                        
+                        link = link.find('a', class_='card_producer').get('href')
+                        
+                    link = f'{url}{link}'
+                    # print(link)
+                    links2.append(link)
+        # print(links2)
+        links3 = []
+        for link in links2:
+            async with aiohttp.ClientSession(trust_env=True) as session:
+                response = await session.get(url=link, data=data, headers=headers, cookies=cookies)
+                soup = BeautifulSoup(await response.text(), "lxml")
+                cards = soup.find_all('div', class_='col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 d-flex')
 
-    def klinker_urls(urls: list):
-        """ Функция для получения url с страницы КЛИНКЕР"""
-        # print(urls[0])
-        # for url in urls:
-        #     # print(url)
-        html = requests.get(url=urls[1], headers=headers)
-        # print(html.text)
-        soup = BeautifulSoup(html.text, 'lxml')
-        cards = soup.find_all('div', class_='col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 d-flex')
-        links = []
-        for link in cards:
-            # print(link)
-            link = link.find('a', class_='card_producer').get('href')
-            link = f'{url}{link}'
-            # print(link)
-            links.append(link)
-        return links
+                for link in cards:
+                    try:
+                        link = link.find('a', calss_='card_collection').get('href')
+                    except AttributeError:
+                        try:
+                            link = link.find('a', class_='card_producer').get('href')
+                        except AttributeError:
+                            try:
+                                link = link.find('a', class_="card_collection").get('href')
+                            except AttributeError:
+                                link = link.find('a', class_="card_any").get('href')
+                    link = f'{url}{link}'
+                    print(link)
 
 
-    def st_urls(urls: list):
-        """ Функция для получения url с страницы СТУПЕНИ"""
-        # print(urls[0])
-        # for url in urls:
-        #     # print(url)
-        html = requests.get(url=urls[2], headers=headers)
-        # print(html.text)
-        soup = BeautifulSoup(html.text, 'lxml')
-        cards = soup.find_all('div', class_='col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 d-flex')
-        links = []
-        for link in cards:
-            link = link.find('a', class_='card_any').get('href')
-            link = f'{url}{link}'
-            # print(link)
-            links.append(link)
-        return links   
+               
 
-    def gr_urls(urls: list):
-        """ Функция для получения url с страницы КРУПНОФОРМАТНЫЙ КЕРАМИЧЕСКИЙ ГРАНИТ"""
-        # print(urls[0])
-        # for url in urls:
-        #     # print(url)
-        html = requests.get(url=urls[3], headers=headers)
-        # print(html.text)
-        soup = BeautifulSoup(html.text, 'lxml')
-        cards = soup.find_all('div', class_='col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 d-flex')
-        links = []
-        for link in cards:
-            # print(link)
-            try:
-                link = link.find('a', class_='card_producer').get('href')
-            except AttributeError:
-                link = link.find('a', class_='card_any').get('href')
-            link = f'{url}{link}'
-            # print(link)
-            links.append(link)
-        return links
 
+            
    
-    countries_urls(nomenclature_urls)
-    klinker_urls(nomenclature_urls)
-    st_urls(nomenclature_urls)
-    gr_urls(nomenclature_urls)
+        task = asyncio.create_task(get_page_data(session))
+        await asyncio.gather(task)
 
 
+def main():
+    asyncio.run(gather_data())
+    # finish_time = time.time() - start_time
+    # print(f"Затраченное на работу скрипта время: {finish_time}")
 
 
-      
-a = Parse()
-# html = a.get_html(url)
-print(a)
-
-
-
-
-
-
-
-
-
-
-
+if __name__ == "__main__":
+    main()
