@@ -3,4 +3,5 @@ venv/
 test.txt
 parser_asyncio.py
 p.py
-catalog_07_02_2023_21_51.xlsx
+catalog_08_02_2023_10_10.xlsx
+__pycache__/

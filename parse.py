@@ -31,6 +31,8 @@ data = {
 
 result = []
 
+OUT_XLSX_FILENAME = f'catalog_{cur_time}.xlsx'
+
 
 class Parse():
 
@@ -898,7 +900,7 @@ class Parse():
         result.append(obj)
 
 
-    OUT_XLSX_FILENAME = f'catalog_{cur_time}.xlsx'
+    
     def write_to_excel(file_name, data):
             """ Запись данных в xlsx файл """
             if not len(data):
