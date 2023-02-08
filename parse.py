@@ -29,8 +29,6 @@ data = {
 }
 
 
-result = []
-
 OUT_XLSX_FILENAME = f'catalog_{cur_time}.xlsx'
 
 
@@ -124,15 +122,10 @@ class Parse():
 
 
     urls1 = get_urls1(url)
-    # print(urls1)
     urls2 = get_urls2(urls1)
-    # get_urls2(urls1)
     urls3 = get_urls3(urls2)
     print(urls3)
     urls4 = get_urls4(urls3)
-    # print('____________')
-    # urls2.append(urls3)
-    # print(urls2)
 
     products_links = []
 
@@ -731,25 +724,8 @@ class Parse():
             haracteristics_17_q = ''
 
 
-            
 
-
-
-
-
-
-
-
-
-
-                # print(frost_resistance_q)
-
-
-
-
-
-
-            obj = {
+        obj = {
 
                     'image': image,
                     'code': code,
@@ -893,7 +869,7 @@ class Parse():
                     'haracteristics_17_q': haracteristics_17_q,
 
 
-                }
+        }
 
                 # print(haracteristics_1)
         print(f'Обработал товар - {title}')
