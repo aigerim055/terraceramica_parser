@@ -1,6 +1,6 @@
 import datetime
 from bs4 import BeautifulSoup
-from decouple import config
+# from decouple import config
 import time
 import xlsxwriter 
 from bs4 import ResultSet
@@ -21,10 +21,18 @@ cookies = {
 headers = {
     'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
 }
+# data = {
+#     'csrfmiddlewaretoken': config('TOKEN'),
+#     'username': config('LOGIN'),
+#     'password': config('PASSWORD'),
+#     'next': '',
+# }
+
+
 data = {
-    'csrfmiddlewaretoken': config('TOKEN'),
-    'username': config('LOGIN'),
-    'password': config('PASSWORD'),
+    'csrfmiddlewaretoken': 'token',
+    'username': 'username',
+    'password': 'password',
     'next': '',
 }
 
@@ -157,8 +165,20 @@ class Parse():
 
 
     for url in products_links:
-        response = requests.get(url=url, data=data, headers=headers, cookies=cookies)
-        soup = BeautifulSoup(response.text, "lxml")
+        try:
+            response = requests.get(url=url, data=data, headers=headers, cookies=cookies)
+            soup = BeautifulSoup(response.text, "lxml")
+        except requests.exceptions.ConnectionError:
+            try:
+                time.sleep(20)
+                response = requests.get(url=url, data=data, headers=headers, cookies=cookies)
+                soup = BeautifulSoup(response.text, "lxml")
+            except requests.exceptions.ConnectionError:
+                time.sleep(40)
+                response = requests.get(url=url, data=data, headers=headers, cookies=cookies)
+                soup = BeautifulSoup(response.text, "lxml")
+
+
 
         try:
                 image = soup.find('div', class_="col-12 col-md-6 col-lg-5 d-flex").find('img').get('src')
@@ -1044,13 +1064,8 @@ class Parse():
     write_to_excel(OUT_XLSX_FILENAME, result)
 
 
-    
-
-
-
 
 def main():
-
     a = Parse()
     print(a)
     finish_time = time.time() - start_time
