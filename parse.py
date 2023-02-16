@@ -1,4 +1,5 @@
 import datetime
+from xml.dom.minidom import Attr
 from bs4 import BeautifulSoup
 # from decouple import config
 import time
@@ -21,18 +22,11 @@ cookies = {
 headers = {
     'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
 }
-# data = {
-#     'csrfmiddlewaretoken': config('TOKEN'),
-#     'username': config('LOGIN'),
-#     'password': config('PASSWORD'),
-#     'next': '',
-# }
-
 
 data = {
-    'csrfmiddlewaretoken': 'token',
-    'username': 'username',
-    'password': 'password',
+    'csrfmiddlewaretoken': '',
+    'username': ' ',
+    'password': '',
     'next': '',
 }
 
@@ -53,6 +47,7 @@ class Parse():
         for link in cards:
             link = link.find('a', class_='card_any').get('href')
             link = f'{url}{link}'
+            print(link + ' - URL1')
             links.append(link)
         return links
 
@@ -71,6 +66,8 @@ class Parse():
                 except AttributeError:
                     link = card.find('a', class_='card_producer').get('href')
                 link = f'https://terraceramica.ru{link}'
+                print(link + ' - URL2')
+
                 links.append(link)
         return links
 
@@ -86,18 +83,29 @@ class Parse():
                 cards: ResultSet = soup.find_all('div', class_="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 d-flex")
                 for card in cards:
                     try:
-                        try:
-                            link = card.find('a', class_='card_producer').get('href')
-                        except AttributeError:
-                            link = card.find('a', class_='card_any').get('href')
+                    #     try:
+                        link = card.find('a', class_='card_collection').get('href')
+                        link = f'https://terraceramica.ru{link}'
+                        print(link + ' - URL3')
+                #         except AttributeError:
+                #             link = card.find('a', class_='card_any').get('href')
 
                     except AttributeError:
-                        try:
-                            link = card.find('a', class_='card_collection').get('href')
-                        except AttributeError:
+                        try:    
                             link = card.find('a', class_='card_producer').get('href')
-                    link = f'https://terraceramica.ru{link}'
-                    print(link)
+                            link = f'https://terraceramica.ru{link}'
+                            print(link + ' - URL3')
+                        except AttributeError:
+                            try:
+                                link = card.find('a', class_='card_any').get('href')
+                                link = f'https://terraceramica.ru{link}'
+                                print(link + ' - URL3')
+                            except AttributeError:
+                                print(url + ' - ERRRORR')
+                    
+                        # link = f'https://terraceramica.ru{link}'
+                    # print(link + ' - URLS3')
+                    # links.append(link)
                 links.append(link)
             except requests.exceptions.ConnectionError:
                 time.sleep(1)
@@ -114,17 +122,32 @@ class Parse():
 
             for card in cards: 
                 try:
-                    link = card.find('a', class_='card_collection').get('href')
+                    link = card.find('a', class_='card_any').get('href')
+                    link = f'https://terraceramica.ru{link}'
+                    print(link + ' - URL4')
                 except AttributeError:
                     try:
-                        link = card.find('a', class_='card_any').get('href')
+                        link = card.find('a', class_='card_collection').get('href')
+                        link = f'https://terraceramica.ru{link}'
+                        print(link + ' - URL4')
                     except AttributeError:
                         try:
-                            link = card.find('a', class_='card_any').get('href')
-                        except AttributeError:
                             link = card.find('a', class_='card_producer').get('href')
-                link = f'https://terraceramica.ru{link}'
-                print(link)
+                            link = f'https://terraceramica.ru{link}'
+                            print(link + ' - URL4')
+                        except AttributeError:
+                            print(url + ' - ERRRORR')
+
+                    # try:
+                    #     link = card.find('a', class_='card_any').get('href')
+                    # except AttributeError:
+                    #     try:
+                    #         link = card.find('a', class_='card_any').get('href')
+                    #     except AttributeError:
+                    # print(url + ' - ERRROR')
+                    #         link = card.find('a', class_='card_producer').get('href')
+                # link = f'https://terraceramica.ru{link}'
+                # print(link + ' - URLS4!!!!!!!!')
                 links.append(link)
         return links 
 
@@ -132,8 +155,10 @@ class Parse():
     urls1 = get_urls1(url)
     urls2 = get_urls2(urls1)
     urls3 = get_urls3(urls2)
-    print(urls3)
+    urls3.append('https://terraceramica.ru/products/13555577/?navitype=1')
+    # print(urls3)
     urls4 = get_urls4(urls3)
+    # # print(urls4)
 
     products_links = []
 
@@ -174,7 +199,7 @@ class Parse():
                 response = requests.get(url=url, data=data, headers=headers, cookies=cookies)
                 soup = BeautifulSoup(response.text, "lxml")
             except requests.exceptions.ConnectionError:
-                time.sleep(40)
+                time.sleep(42)
                 response = requests.get(url=url, data=data, headers=headers, cookies=cookies)
                 soup = BeautifulSoup(response.text, "lxml")
 
