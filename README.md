@@ -1,5 +1,5 @@
 
-Запуск проекта:
+Запуск скрипта:
 
 1.  `git clone git@github.com:aigerim055/terraceramica_parser.git`
 2.  `cd terraceramica_parser`
