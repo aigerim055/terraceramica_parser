@@ -157,6 +157,9 @@ class Parse():
     urls3 = get_urls3(urls2)
     urls3.append('https://terraceramica.ru/products/13555577/?navitype=1')
     # print(urls3)
+    urls3.append('https://terraceramica.ru/products/819263/?navitype=1')
+    urls3.append('https://terraceramica.ru/products/795638/?navitype=1')
+
     urls4 = get_urls4(urls3)
     # # print(urls4)
 
